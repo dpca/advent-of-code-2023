@@ -1,6 +1,7 @@
 use std::fs;
 
-fn sum_contents(contents: String, calibration_fn: &dyn Fn(&str) -> u32) -> u32 {
+fn sum_contents(calibration_fn: &dyn Fn(&str) -> u32) -> u32 {
+    let contents = fs::read_to_string("./inputs/day1.txt").expect("No file found");
     let lines = contents.split("\n");
 
     return lines
@@ -29,8 +30,7 @@ fn calibration_value1(input: &str) -> u32 {
 }
 
 fn part1() -> u32 {
-    let contents = fs::read_to_string("./inputs/day1.txt").expect("No file found");
-    return sum_contents(contents, &calibration_value1);
+    return sum_contents(&calibration_value1);
 }
 
 const NUMBER_LOOKUP: [(&str, [&str; 2]); 9] = [
@@ -82,8 +82,7 @@ fn calibration_value2(input: &str) -> u32 {
 }
 
 fn part2() -> u32 {
-    let contents = fs::read_to_string("./inputs/day1.txt").expect("No file found");
-    return sum_contents(contents, &calibration_value2);
+    return sum_contents(&calibration_value2);
 }
 
 pub fn run() {
