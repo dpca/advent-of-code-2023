@@ -19,7 +19,8 @@ fn calibration_value1(input: &str) -> u32 {
     return result.parse().unwrap();
 }
 
-fn part1(contents: String) -> u32 {
+fn part1() -> u32 {
+    let contents = fs::read_to_string("./inputs/day1.txt").expect("No file found");
     let lines = contents.split("\n");
 
     let mut sum = 0;
@@ -82,7 +83,8 @@ fn calibration_value2(input: &str) -> u32 {
     return result.parse().unwrap();
 }
 
-fn part2(contents: String) -> u32 {
+fn part2() -> u32 {
+    let contents = fs::read_to_string("./inputs/day1.txt").expect("No file found");
     let lines = contents.split("\n");
 
     let mut sum = 0;
@@ -98,8 +100,21 @@ fn part2(contents: String) -> u32 {
 }
 
 pub fn run() {
-    let contents = fs::read_to_string("./inputs/day1.txt").expect("No file found");
+    println!("Part 1: {}", part1());
+    println!("Part 2: {}", part2());
+}
 
-    println!("Part 1: {}", part1(contents.clone()));
-    println!("Part 2: {}", part2(contents.clone()));
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_part1() {
+        assert_eq!(part1(), 55123);
+    }
+
+    #[test]
+    fn test_part2() {
+        assert_eq!(part2(), 55260);
+    }
 }
