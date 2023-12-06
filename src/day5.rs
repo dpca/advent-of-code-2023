@@ -10,6 +10,7 @@ struct AlmanacMapping {
     range_length: u64,
 }
 
+#[allow(dead_code)]
 #[derive(Debug)]
 struct AlmanacSection {
     input: String,
