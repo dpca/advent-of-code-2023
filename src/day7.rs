@@ -31,7 +31,7 @@ fn hand_ranking(hand: &str) -> u32 {
 
 fn parse_line(
     reader: &mut io::BufReader<File>,
-    poker_type_fn: &dyn Fn(&str) -> String,
+    poker_type_fn: &dyn Fn(&str) -> &str,
 ) -> Result<CardHand, &'static str> {
     let mut buffer = String::new();
     let len = reader.read_line(&mut buffer).expect("No file found");
@@ -43,13 +43,13 @@ fn parse_line(
     let (hand, bid) = buffer.split_once(" ").unwrap();
     return Ok(CardHand {
         hand: hand.to_string(),
-        poker_type: poker_type_fn(&hand),
+        poker_type: poker_type_fn(&hand).to_string(),
         bid: bid.trim().parse().unwrap(),
     });
 }
 
 fn get_sorted_hands(
-    poker_type_fn: &dyn Fn(&str) -> String,
+    poker_type_fn: &dyn Fn(&str) -> &str,
     card_ranking_fn: &dyn Fn(&char) -> u32,
 ) -> Vec<CardHand> {
     let mut reader = file_reader();
@@ -88,7 +88,7 @@ fn get_sorted_hands(
 }
 
 fn get_winnings(
-    poker_type_fn: &dyn Fn(&str) -> String,
+    poker_type_fn: &dyn Fn(&str) -> &str,
     card_ranking_fn: &dyn Fn(&char) -> u32,
 ) -> u32 {
     let mut sum = 0;
@@ -105,36 +105,36 @@ fn get_winnings(
 
 // Part 1
 
-fn poker_type_1(hand: &str) -> String {
+fn poker_type_1(hand: &str) -> &str {
     let mut h: HashMap<char, u32> = HashMap::new();
     for char in hand.chars() {
         *h.entry(char).or_insert(0) += 1;
     }
 
     if h.len() == 2 && h.values().any(|v| *v == 3) {
-        return "Full house".to_string();
+        return "Full house";
     }
 
     if h.len() == 3 && !h.values().any(|v| *v == 3) {
-        return "Two pair".to_string();
+        return "Two pair";
     }
 
     for count in h.values() {
         if *count == 5 {
-            return "Five of a kind".to_string();
+            return "Five of a kind";
         };
         if *count == 4 {
-            return "Four of a kind".to_string();
+            return "Four of a kind";
         };
         if *count == 3 {
-            return "Three of a kind".to_string();
+            return "Three of a kind";
         };
         if *count == 2 {
-            return "One pair".to_string();
+            return "One pair";
         };
     }
 
-    return "High card".to_string();
+    return "High card";
 }
 
 fn card_ranking_1(card: &char) -> u32 {
@@ -154,7 +154,7 @@ fn part1() -> u32 {
 
 // Part 2
 
-fn poker_type_2(hand: &str) -> String {
+fn poker_type_2(hand: &str) -> &str {
     let mut h: HashMap<char, u32> = HashMap::new();
     for char in hand.chars() {
         *h.entry(char).or_insert(0) += 1;
@@ -162,27 +162,27 @@ fn poker_type_2(hand: &str) -> String {
 
     if h.contains_key(&'J') {
         if h.len() == 2 {
-            return "Five of a kind".to_string();
+            return "Five of a kind";
         }
 
         if h.len() == 3 {
             if h[&'J'] == 3 || h[&'J'] == 2 || h.values().any(|v| *v == 3) {
-                return "Four of a kind".to_string();
+                return "Four of a kind";
             }
-            return "Full house".to_string();
+            return "Full house";
         }
 
         if h.len() == 4 {
-            return "Three of a kind".to_string();
+            return "Three of a kind";
         }
 
         if h.len() == 5 {
-            return "One pair".to_string();
+            return "One pair";
         }
     }
 
     if h.len() == 2 && h.values().any(|v| *v == 3) {
-        return "Full house".to_string();
+        return "Full house";
     }
 
     return poker_type_1(&hand);
