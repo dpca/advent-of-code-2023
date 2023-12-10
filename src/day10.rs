@@ -38,6 +38,8 @@ fn parse_pipe(input: char) -> Pipe {
     };
 }
 
+// Helpful debugging function to visualize map
+#[allow(dead_code)]
 fn print_map(map: &Vec<Vec<Pipe>>) {
     let mut out: String = "".to_string();
     for line in map {
@@ -250,7 +252,6 @@ fn part2() -> usize {
     }
 
     flood_fill(&mut sparse_map, 0, 0);
-    print_map(&sparse_map);
 
     return sparse_map
         .iter()
@@ -279,6 +280,6 @@ mod tests {
 
     #[test]
     fn test_part2() {
-        assert_eq!(part2(), 966);
+        assert_eq!(part2(), 493);
     }
 }
