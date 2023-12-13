@@ -86,28 +86,22 @@ fn part1() -> u64 {
 // Part 2
 
 fn least_common_factor(nums: Vec<u64>) -> u64 {
-    let mut factors: Vec<(u64, u64)> = Vec::new();
-    let mut biggest_num: u64 = 0;
-    for i in nums {
-        if i > biggest_num {
-            biggest_num = i;
-        }
-        factors.push((i, i));
-    }
+    if nums.len() > 1 {
+        let mut num1 = nums[0];
+        let mut num2 = nums[1];
 
-    let mut needs_update = true;
-    while needs_update {
-        needs_update = false;
-        for idx in 0..factors.len() {
-            while factors[idx].1 < biggest_num {
-                factors[idx].1 += factors[idx].0;
-                needs_update = true;
+        while num1 != num2 {
+            if num1 < num2 {
+                num1 += nums[0];
+            } else {
+                num2 += nums[1];
             }
-            biggest_num = factors[idx].1;
         }
+
+        return least_common_factor([&[num1], &nums[2..]].concat());
     }
 
-    return biggest_num;
+    return nums[0];
 }
 
 fn part2() -> u64 {
