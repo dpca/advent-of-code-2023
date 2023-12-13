@@ -115,6 +115,7 @@ fn unfold_row(row: &Row) -> Row {
 }
 
 fn part2() -> u32 {
+    return 1;
     let rows = parse_input();
     return rows
         .iter()
