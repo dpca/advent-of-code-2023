@@ -10,13 +10,6 @@ enum Position {
     Empty,
 }
 
-enum Direction {
-    North,
-    South,
-    East,
-    West,
-}
-
 type Mirror = Vec<Vec<Position>>;
 
 fn parse_position(position: char) -> Position {
