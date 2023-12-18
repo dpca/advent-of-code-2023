@@ -86,10 +86,67 @@ fn print_map(map: &CityMap, previous: &HashMap<Node, Node>, last: &Node) {
     print!("\n");
 }
 
-fn get_lowest_cost(
-    map: &CityMap,
-    add_neighbor: &dyn Fn(&mut Vec<Node>, Node, Direction, usize, usize),
-) -> u32 {
+fn add_neighbor(
+    neighbors: &mut Vec<Node>,
+    neighbor_filter: &dyn Fn(&Node, &Direction) -> bool,
+    position: Node,
+    direction: Direction,
+    row_max: usize,
+    col_max: usize,
+) {
+    if neighbor_filter(&position, &direction) {
+        return;
+    }
+
+    let mut row = position.row;
+    let mut col = position.col;
+
+    match direction {
+        Direction::North => {
+            if position.row > 0 {
+                row -= 1
+            } else {
+                return;
+            }
+        }
+        Direction::South => {
+            if position.row < row_max {
+                row += 1
+            } else {
+                return;
+            }
+        }
+        Direction::East => {
+            if position.col < col_max {
+                col += 1
+            } else {
+                return;
+            }
+        }
+        Direction::West => {
+            if position.col > 0 {
+                col -= 1
+            } else {
+                return;
+            }
+        }
+    }
+
+    let straights = if position.direction == direction {
+        position.straights + 1
+    } else {
+        0
+    };
+
+    neighbors.push(Node {
+        row,
+        col,
+        direction,
+        straights,
+    });
+}
+
+fn get_lowest_cost(map: &CityMap, neighbor_filter: &dyn Fn(&Node, &Direction) -> bool) -> u32 {
     let row_max = map.len() - 1;
     let col_max = map[0].len() - 1;
 
@@ -146,24 +203,108 @@ fn get_lowest_cost(
         let mut neighbors: Vec<Node> = Vec::new();
         match position.direction {
             Direction::North => {
-                add_neighbor(&mut neighbors, position, Direction::East, row_max, col_max);
-                add_neighbor(&mut neighbors, position, Direction::West, row_max, col_max);
-                add_neighbor(&mut neighbors, position, Direction::North, row_max, col_max);
+                add_neighbor(
+                    &mut neighbors,
+                    neighbor_filter,
+                    position,
+                    Direction::East,
+                    row_max,
+                    col_max,
+                );
+                add_neighbor(
+                    &mut neighbors,
+                    neighbor_filter,
+                    position,
+                    Direction::West,
+                    row_max,
+                    col_max,
+                );
+                add_neighbor(
+                    &mut neighbors,
+                    neighbor_filter,
+                    position,
+                    Direction::North,
+                    row_max,
+                    col_max,
+                );
             }
             Direction::South => {
-                add_neighbor(&mut neighbors, position, Direction::East, row_max, col_max);
-                add_neighbor(&mut neighbors, position, Direction::West, row_max, col_max);
-                add_neighbor(&mut neighbors, position, Direction::South, row_max, col_max);
+                add_neighbor(
+                    &mut neighbors,
+                    neighbor_filter,
+                    position,
+                    Direction::East,
+                    row_max,
+                    col_max,
+                );
+                add_neighbor(
+                    &mut neighbors,
+                    neighbor_filter,
+                    position,
+                    Direction::West,
+                    row_max,
+                    col_max,
+                );
+                add_neighbor(
+                    &mut neighbors,
+                    neighbor_filter,
+                    position,
+                    Direction::South,
+                    row_max,
+                    col_max,
+                );
             }
             Direction::East => {
-                add_neighbor(&mut neighbors, position, Direction::North, row_max, col_max);
-                add_neighbor(&mut neighbors, position, Direction::South, row_max, col_max);
-                add_neighbor(&mut neighbors, position, Direction::East, row_max, col_max);
+                add_neighbor(
+                    &mut neighbors,
+                    neighbor_filter,
+                    position,
+                    Direction::North,
+                    row_max,
+                    col_max,
+                );
+                add_neighbor(
+                    &mut neighbors,
+                    neighbor_filter,
+                    position,
+                    Direction::South,
+                    row_max,
+                    col_max,
+                );
+                add_neighbor(
+                    &mut neighbors,
+                    neighbor_filter,
+                    position,
+                    Direction::East,
+                    row_max,
+                    col_max,
+                );
             }
             Direction::West => {
-                add_neighbor(&mut neighbors, position, Direction::North, row_max, col_max);
-                add_neighbor(&mut neighbors, position, Direction::South, row_max, col_max);
-                add_neighbor(&mut neighbors, position, Direction::West, row_max, col_max);
+                add_neighbor(
+                    &mut neighbors,
+                    neighbor_filter,
+                    position,
+                    Direction::North,
+                    row_max,
+                    col_max,
+                );
+                add_neighbor(
+                    &mut neighbors,
+                    neighbor_filter,
+                    position,
+                    Direction::South,
+                    row_max,
+                    col_max,
+                );
+                add_neighbor(
+                    &mut neighbors,
+                    neighbor_filter,
+                    position,
+                    Direction::West,
+                    row_max,
+                    col_max,
+                );
             }
         }
 
@@ -188,66 +329,13 @@ fn get_lowest_cost(
 
 const MAX_STRAIGHTS_1: u8 = 2;
 
-fn add_neighbor_1(
-    neighbors: &mut Vec<Node>,
-    position: Node,
-    direction: Direction,
-    row_max: usize,
-    col_max: usize,
-) {
-    if position.direction == direction && position.straights == MAX_STRAIGHTS_1 {
-        return;
-    }
-
-    let mut row = position.row;
-    let mut col = position.col;
-
-    match direction {
-        Direction::North => {
-            if position.row > 0 {
-                row -= 1
-            } else {
-                return;
-            }
-        }
-        Direction::South => {
-            if position.row < row_max {
-                row += 1
-            } else {
-                return;
-            }
-        }
-        Direction::East => {
-            if position.col < col_max {
-                col += 1
-            } else {
-                return;
-            }
-        }
-        Direction::West => {
-            if position.col > 0 {
-                col -= 1
-            } else {
-                return;
-            }
-        }
-    }
-
-    neighbors.push(Node {
-        row,
-        col,
-        direction,
-        straights: if position.direction == direction {
-            position.straights + 1
-        } else {
-            0
-        },
-    });
+fn neighbor_filter_1(position: &Node, direction: &Direction) -> bool {
+    return &position.direction == direction && position.straights == MAX_STRAIGHTS_1;
 }
 
 fn part1() -> u32 {
     let map = parse_input();
-    return get_lowest_cost(&map, &add_neighbor_1);
+    return get_lowest_cost(&map, &neighbor_filter_1);
 }
 
 // Part 2
@@ -255,70 +343,14 @@ fn part1() -> u32 {
 const MIN_STRAIGHTS_2: u8 = 3;
 const MAX_STRAIGHTS_2: u8 = 9;
 
-fn add_neighbor_2(
-    neighbors: &mut Vec<Node>,
-    position: Node,
-    direction: Direction,
-    row_max: usize,
-    col_max: usize,
-) {
-    if position.direction == direction && position.straights == MAX_STRAIGHTS_2 {
-        return;
-    }
-
-    if position.direction != direction && position.straights < MIN_STRAIGHTS_2 {
-        return;
-    }
-
-    let mut row = position.row;
-    let mut col = position.col;
-
-    match direction {
-        Direction::North => {
-            if position.row > 0 {
-                row -= 1
-            } else {
-                return;
-            }
-        }
-        Direction::South => {
-            if position.row < row_max {
-                row += 1
-            } else {
-                return;
-            }
-        }
-        Direction::East => {
-            if position.col < col_max {
-                col += 1
-            } else {
-                return;
-            }
-        }
-        Direction::West => {
-            if position.col > 0 {
-                col -= 1
-            } else {
-                return;
-            }
-        }
-    }
-
-    neighbors.push(Node {
-        row,
-        col,
-        direction,
-        straights: if position.direction == direction {
-            position.straights + 1
-        } else {
-            0
-        },
-    });
+fn neighbor_filter_2(position: &Node, direction: &Direction) -> bool {
+    return (&position.direction == direction && position.straights == MAX_STRAIGHTS_2)
+        || (&position.direction != direction && position.straights < MIN_STRAIGHTS_2);
 }
 
 fn part2() -> u32 {
     let map = parse_input();
-    return get_lowest_cost(&map, &add_neighbor_2);
+    return get_lowest_cost(&map, &neighbor_filter_2);
 }
 
 // Main
