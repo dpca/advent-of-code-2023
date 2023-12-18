@@ -152,7 +152,7 @@ fn get_lowest_cost(map: &CityMap, neighbor_filter: &dyn Fn(&Node, &Direction) ->
 
     let mut heap = BinaryHeap::new();
     let mut dist: HashMap<Node, u32> = HashMap::new();
-    let mut previous: HashMap<Node, Node> = HashMap::new();
+    //let mut previous: HashMap<Node, Node> = HashMap::new();
 
     dist.insert(
         Node {
@@ -193,6 +193,7 @@ fn get_lowest_cost(map: &CityMap, neighbor_filter: &dyn Fn(&Node, &Direction) ->
 
     while let Some(State { cost, position }) = heap.pop() {
         if position.row == row_max && position.col == col_max {
+            //print_map(&map, &previous, &position);
             return cost;
         }
 
@@ -317,7 +318,7 @@ fn get_lowest_cost(map: &CityMap, neighbor_filter: &dyn Fn(&Node, &Direction) ->
             if !dist.contains_key(&neighbor) || next.cost < dist[&neighbor] {
                 heap.push(next);
                 dist.insert(neighbor, next.cost);
-                previous.insert(neighbor, position);
+                //previous.insert(neighbor, position);
             }
         }
     }
