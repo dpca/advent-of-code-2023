@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::collections::HashSet;
 use std::fs;
 
 // Common
@@ -123,6 +124,45 @@ fn parse_input() -> (HashMap<String, Workflow>, Vec<Part>) {
     )
 }
 
+fn get_all_terminal_nodes(
+    workflows: &HashMap<String, Workflow>,
+) -> (HashSet<String>, HashSet<String>) {
+    let mut accepted_outputs: HashSet<String> = HashSet::new();
+    accepted_outputs.insert("A".to_string());
+
+    let mut rejected_outputs: HashSet<String> = HashSet::new();
+    rejected_outputs.insert("R".to_string());
+
+    let mut new_output = true;
+    while new_output {
+        new_output = false;
+        for (name, workflow) in workflows.iter() {
+            let mut all_outputs: Vec<String> = workflow
+                .rules
+                .iter()
+                .map(|r| r.destination.to_string())
+                .collect();
+            all_outputs.push(workflow.default.to_string());
+
+            if !accepted_outputs.contains(name)
+                && all_outputs.iter().all(|o| accepted_outputs.contains(o))
+            {
+                new_output = true;
+                accepted_outputs.insert(name.clone());
+            }
+
+            if !rejected_outputs.contains(name)
+                && all_outputs.iter().all(|o| rejected_outputs.contains(o))
+            {
+                new_output = true;
+                rejected_outputs.insert(name.clone());
+            }
+        }
+    }
+
+    return (accepted_outputs, rejected_outputs);
+}
+
 // Part 1
 
 fn run_workflow(part: &Part, workflow: &Workflow) -> String {
@@ -185,13 +225,15 @@ fn part_rating(part: &Part) -> u32 {
 fn part1() -> u32 {
     let (workflows, parts) = parse_input();
 
+    let (accepted_outputs, rejected_outputs) = get_all_terminal_nodes(&workflows);
+
     let mut accepted_parts: Vec<Part> = Vec::new();
     for part in parts {
         let mut workflow = "in".to_string();
-        while workflow != "A" && workflow != "R" {
+        while !accepted_outputs.contains(&workflow) && !rejected_outputs.contains(&workflow) {
             workflow = run_workflow(&part, &workflows[&workflow]);
         }
-        if workflow == "A" {
+        if accepted_outputs.contains(&workflow) {
             accepted_parts.push(part);
         }
     }
